@@ -1,17 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import PhotoViewer from './photoviewer';
 
 
 export default function Home() {
-  const [files, setFiles] = useState([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
-  async function folderSelectionHandler(e: React.SyntheticEvent) {
-    e.preventDefault();
+  const HandleDirectoryPicker = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-    const dirHandle = await window.showDirectoryPicker();
-    const fileList = [];
+    const files = e.target.files;
+    if (!files) return;
 
+    const images = Array.from(files).filter((file) =>
+      file.type.startsWith("image/")
+    );
+
+    setImageFiles(images);
   }
 
   return (
@@ -21,9 +26,16 @@ export default function Home() {
       </header>
       <div className="flex h-screen">
         <div className="m-auto">
-          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center" type="button" onClick={folderSelectionHandler}>
-            Choose a location:
-          </button>
+          {imageFiles.length == 0 ? (
+          <>
+            <label htmlFor="dir-upload" className='text-5xl' > 📁 Select a folder</label>
+            <input id="dir-upload" name='picker' type='file' webkitdirectory="true"
+              directory="true" multiple accept='image/*' className='hidden'
+              onChange={HandleDirectoryPicker} />
+          </>
+          ): (
+            <PhotoViewer imageFiles={imageFiles}/>
+          )}
         </div>
       </div>
 
